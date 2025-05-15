@@ -1,0 +1,164 @@
+import estudiante.*
+import baseDeDatos.*
+import sistema.*
+import materia.*
+import carrera.*
+import aprobado.*
+
+describe "Test de Base de Datos"{
+    const matematica = new Materia()
+    const objetos1 = new Materia()
+    const intro = new Materia()
+    const quimica = new Materia()
+    const programacion = new Carrera(materias=#{matematica, intro, objetos1})
+    const medicina = new Carrera(materias=#{quimica})
+
+    const sergio = new Estudiante(carreras=#{programacion, medicina})
+    const jose = new Estudiante(carreras=#{programacion, medicina})
+
+    const aprobado1 = new Aprobado(materia=matematica, estudiante=sergio, nota=8)
+    const aprobado2 = new Aprobado(materia=matematica, estudiante=sergio, nota=5)
+    const aprobado3 = new Aprobado(materia=intro, estudiante=sergio, nota=7)
+    const aprobado4 = new Aprobado(materia=matematica, estudiante=jose, nota=8)
+    test "Se agrega dos veces al mismo estudiante y misma materia"{
+        baseDeDatos.registrarAprobado(aprobado1)
+        assert.throwsException({baseDeDatos.registrarAprobado(aprobado2)})
+        assert.equals(1, baseDeDatos.aprobados().size())
+    }
+    test "Se agrega mismo estudiante con dos materias distintas"{
+        baseDeDatos.registrarAprobado(aprobado1)
+        baseDeDatos.registrarAprobado(aprobado3)
+        assert.equals(2, baseDeDatos.aprobados().size())
+    }
+
+    test "Se agregan dos estudiantes diferentes con misma materia"{
+        baseDeDatos.registrarAprobado(aprobado1)
+        baseDeDatos.registrarAprobado(aprobado4)
+        assert.equals(2, baseDeDatos.aprobados().size())
+    }
+
+}
+
+describe "Test Sistema"{
+    const matematica = new Materia()
+    const objetos1 = new Materia()
+    const objetos2 = new Materia(_requisitos_=#{objetos1})
+    const intro = new Materia()
+    const quimica = new Materia()
+
+    const programacion = new Carrera(materias=#{matematica, intro, objetos1, objetos2})
+    const medicina = new Carrera(materias=#{quimica})
+
+    const sergio = new Estudiante(carreras=#{programacion, medicina})
+    const jose = new Estudiante(carreras=#{programacion, medicina})
+    const juan = new Estudiante(carreras=#{medicina})
+
+    const aprobado1 = new Aprobado(materia=matematica, estudiante=sergio, nota=8)
+    const aprobado3 = new Aprobado(materia=intro, estudiante=sergio, nota=7)
+    const aprobado4 = new Aprobado(materia=matematica, estudiante=jose, nota=8)
+    
+    method initialize(){
+        baseDeDatos.registrarAprobado(aprobado1)
+        baseDeDatos.registrarAprobado(aprobado3)
+        baseDeDatos.registrarAprobado(aprobado4)
+    }
+
+    test "Se cuentan cantidad de aprobados de sergio y jose"{
+        assert.equals(2, sistema.cantidadDeAprobadasPor(sergio))
+        assert.equals(1, sistema.cantidadDeAprobadasPor(jose))
+    }
+
+    test "Se pide lista de materias aprobadas por sergio y jose"{
+        assert.equals([matematica, intro], sistema.listaDeAprobadasPor(sergio))
+        assert.equals([matematica], sistema.listaDeAprobadasPor(jose))
+    }
+
+    test "Sergio tiene aprobada matematica pero no Objetos 1"{
+        assert.that(sistema.tieneAprobadaA_(sergio,matematica))
+        assert.notThat(sistema.tieneAprobadaA_(jose,objetos1))
+    }
+
+    test "error al anotar a sergio a objetos2 sin tener aprobada objetos1"{
+        assert.throwsException({sistema.inscribirA_Al_(objetos2, sergio)})
+    }
+
+    test "objetos2 pertenece a una carrera que cursa sergio pero no a una que cursa juan"{
+        assert.doesNotThrowException({sistema.validarMateriaDeCarrerasDe(objetos2, sergio)})
+        assert.throwsException({sistema.validarMateriaDeCarrerasDe(objetos2, juan)})
+    }
+
+    test "sergio no está anotado en objetos2 pero si está en objetos1"{
+        assert.throwsException({sistema.validarQueEsteAnotado(objetos1, sergio)})        
+        sistema.inscribirA_Al_(objetos1, sergio)
+        assert.doesNotThrowException({sistema.validarQueEsteAnotado(objetos1, sergio)})        
+        assert.throwsException({sistema.validarQueEsteAnotado(objetos2, sergio)})
+    }
+
+    test "error al validar correlativas de objetos2 para sergio"{
+        assert.throwsException({sistema.validarCorrelativasParaAnotarseA(objetos2, sergio)})
+    }
+}
+
+describe "Tests de Inscripcion a Materias"{
+
+    const matematica = new Materia()
+    const objetos1 = new Materia()
+    const intro = new Materia()
+    const quimica = new Materia()
+    const biologia1 = new Materia(cupo=1)
+    const programacion = new Carrera(materias=#{matematica, intro, objetos1})
+    const medicina = new Carrera(materias=#{quimica,biologia1})
+
+    const sergio = new Estudiante(carreras=#{programacion, medicina})
+    const jose = new Estudiante(carreras=#{medicina})
+
+    test "inscribir a matematica a sergio"{
+        sistema.inscribirA_Al_(matematica, sergio)
+        assert.equals(1, matematica.inscriptos().size())
+        assert.equals(9, matematica.cupo())
+    }
+
+    test "inscribir a matematica a sergio y a quimica a sergio y a jose "{
+        sistema.inscribirA_Al_(matematica, sergio)
+        sistema.inscribirA_Al_(quimica, sergio)
+        assert.equals(2, sistema.materiasEnLasQueEstaInscripto(sergio).size())
+        assert.equals(9, matematica.cupo())
+        assert.equals(9, quimica.cupo())
+        sistema.inscribirA_Al_(quimica, jose)
+        assert.equals(1, sistema.materiasEnLasQueEstaInscripto(jose).size())
+        assert.equals(8, quimica.cupo())
+        assert.throwsException({sistema.inscribirA_Al_(matematica, jose)})
+    }
+
+    test "inscribir y desinscribir a sergio de matematica"{
+        sistema.inscribirA_Al_(matematica, sergio)
+        assert.equals(1, sistema.materiasEnLasQueEstaInscripto(sergio).size())
+        assert.equals(9, matematica.cupo())        
+        sistema.bajaDeInscripcionDe(matematica, sergio)
+        assert.equals(0, sistema.materiasEnLasQueEstaInscripto(sergio).size())
+        assert.equals(10, matematica.cupo())
+        assert.throwsException({sistema.bajaDeInscripcionDe(matematica, sergio)})
+    }
+    test "inscribir a sergio y jose en biologia1 que tiene 1 solo cupo."{
+        sistema.inscribirA_Al_(biologia1, sergio)
+        sistema.inscribirA_Al_(biologia1, jose)
+        assert.equals(1, biologia1.inscriptos().size())
+        assert.equals(1, biologia1.enListaDeEspera().size())
+        assert.throwsException({sistema.bajaDeInscripcionDe(biologia1, jose)})
+        sistema.bajaDeInscripcionDe(biologia1, sergio)
+        assert.equals(1, biologia1.inscriptos().size())
+        assert.equals(0, biologia1.enListaDeEspera().size())
+    }
+
+    test "ver materias de sergio y jose"{
+        sistema.inscribirA_Al_(matematica, sergio)
+        sistema.inscribirA_Al_(quimica, sergio)
+        sistema.inscribirA_Al_(quimica, jose)
+        sistema.inscribirA_Al_(biologia1, sergio)
+        sistema.inscribirA_Al_(biologia1, jose)        
+        assert.equals(3, sistema.materiasEnLasQueEstaInscripto(sergio).size())
+        assert.equals(0,sistema.materiasEnLasQueEstaEnListaDeEspera(sergio).size())
+        assert.equals(1,sistema.materiasEnLasQueEstaEnListaDeEspera(jose).size())
+
+    }
+}

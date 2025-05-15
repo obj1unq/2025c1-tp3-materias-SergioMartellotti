@@ -1,0 +1,110 @@
+import materia.*
+import carrera.*
+import estudiante.*
+import baseDeDatos.*
+import aprobado.*
+import sistema.*
+
+describe "Tests del sistema de inscripciones"{
+
+    const elementosProgramacion = new Materia()
+    const matematica1 = new Materia()
+    const objetos1 = new Materia()
+    const objetos2 = new Materia(_requisitos_= #{matematica1,objetos1}, cupo=3)
+    const BBDD = new Materia()
+    const objetos3 = new Materia(_requisitos_= #{BBDD,objetos2})
+    const concurrente = new Materia(_requisitos_= #{BBDD,objetos1})
+    const tFinal = new Materia()
+    const programacion = new Carrera(materias= #{elementosProgramacion, matematica1, objetos1, objetos2, BBDD, objetos3, concurrente, tFinal})
+
+    const biologia1 = new Materia()
+    const biologia2 = new Materia(_requisitos_= #{biologia1})
+    const quimica = new Materia()
+    const anatomiaGral = new Materia()
+    const medicina = new Carrera(materias= #{biologia1, biologia2, quimica, anatomiaGral})
+
+    const latin = new Materia()
+    const dRomano = new Materia()
+    const historiaDArgentino = new Materia()
+    const dPenal1 = new Materia()
+    const dPenal2 = new Materia(_requisitos_= #{dPenal1})
+    const derecho = new Carrera(materias = #{latin, dRomano, historiaDArgentino, dPenal1, dPenal2})
+
+    const roque = new Estudiante(carreras= #{programacion, medicina})
+    const aprobado1 = new Aprobado(materia=matematica1, estudiante=roque, nota=7)
+    const aprobado2 = new Aprobado(materia=objetos1, estudiante=roque, nota=8)
+    const aprobado13 = new Aprobado(materia=elementosProgramacion, estudiante=roque, nota=9)
+    const aprobado14 = new Aprobado(materia=BBDD, estudiante=roque, nota=9)
+    const aprobado15 = new Aprobado(materia=quimica, estudiante=roque, nota=9)
+    const aprobado16 = new Aprobado(materia=biologia1, estudiante=roque, nota=9)
+
+    const luisa = new Estudiante(carreras= #{programacion})
+    const aprobado3 = new Aprobado(materia=matematica1, estudiante=luisa, nota=7)
+    const aprobado4 = new Aprobado(materia=objetos1, estudiante=luisa, nota=8)
+    const aprobado5 = new Aprobado(materia=elementosProgramacion, estudiante=luisa, nota=9)
+
+    const romina = new Estudiante(carreras= #{programacion})
+    const aprobado6 = new Aprobado(materia=matematica1, estudiante=romina, nota=7)
+    const aprobado7 = new Aprobado(materia=objetos1, estudiante=romina, nota=8)
+    const aprobado8 = new Aprobado(materia=elementosProgramacion, estudiante=romina, nota=9)
+
+    const alicia = new Estudiante(carreras= #{programacion})
+    const aprobado9 = new Aprobado(materia=matematica1, estudiante=alicia, nota=7)
+    const aprobado10 = new Aprobado(materia=objetos1, estudiante=alicia, nota=8)
+    const aprobado11 = new Aprobado(materia=elementosProgramacion, estudiante=alicia, nota=9)
+
+    const ana = new Estudiante(carreras= #{programacion})
+    const aprobado12 = new Aprobado(materia=elementosProgramacion, estudiante=ana, nota=9)
+
+    method initialize(){
+        baseDeDatos.registrarAprobado(aprobado1)
+        baseDeDatos.registrarAprobado(aprobado2)
+        baseDeDatos.registrarAprobado(aprobado3)
+        baseDeDatos.registrarAprobado(aprobado4)
+        baseDeDatos.registrarAprobado(aprobado5)
+        baseDeDatos.registrarAprobado(aprobado6)
+        baseDeDatos.registrarAprobado(aprobado7)
+        baseDeDatos.registrarAprobado(aprobado8)
+        baseDeDatos.registrarAprobado(aprobado9)
+        baseDeDatos.registrarAprobado(aprobado10)
+        baseDeDatos.registrarAprobado(aprobado11)
+        baseDeDatos.registrarAprobado(aprobado12)
+        baseDeDatos.registrarAprobado(aprobado13)
+        baseDeDatos.registrarAprobado(aprobado14)
+        baseDeDatos.registrarAprobado(aprobado15)
+        baseDeDatos.registrarAprobado(aprobado16)
+    }
+
+    test "Roque puede inscribirse en objetos2 pero no en objetos3 ni en objetos1"{
+        assert.doesNotThrowException({sistema.inscribirA_Al_(objetos2, roque)})
+        assert.throwsException({sistema.inscribirA_Al_(objetos1, roque)})
+        assert.throwsException({sistema.inscribirA_Al_(objetos3, roque)})
+    }
+
+    test "Roque puede inscribirse en elementosProgramacion, objetos2 y concurrente"{
+        assert.doesNotThrowException({sistema.inscribirA_Al_(objetos2, roque)})
+        assert.doesNotThrowException({sistema.inscribirA_Al_(concurrente, roque)})
+        assert.doesNotThrowException({sistema.inscribirA_Al_(biologia2, roque)})
+    }    
+
+    test "Se inscriben luisa, romina, alicia y roque a objetos2"{
+        sistema.inscribirA_Al_(objetos2, luisa)
+        sistema.inscribirA_Al_(objetos2, romina)
+        sistema.inscribirA_Al_(objetos2, alicia)
+        sistema.inscribirA_Al_(objetos2, roque)
+        assert.equals(3, objetos2.inscriptos().size())
+        assert.equals(1, objetos2.enListaDeEspera().size())
+        assert.equals(roque, objetos2.enListaDeEspera().first())
+    }
+
+    test "Se inscriben luisa, romina, alicia y roque a objetos2, romina se da de baja"{
+        sistema.inscribirA_Al_(objetos2, luisa)
+        sistema.inscribirA_Al_(objetos2, romina)
+        sistema.inscribirA_Al_(objetos2, alicia)
+        sistema.inscribirA_Al_(objetos2, roque)
+        sistema.bajaDeInscripcionDe(objetos2, romina)
+        assert.equals(3, objetos2.inscriptos().size())
+        assert.equals(0, objetos2.enListaDeEspera().size())
+    }
+}
+
