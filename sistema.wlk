@@ -50,7 +50,7 @@ object sistema {
         self.validarMateriaDeCarrerasDe(materia, estudiante)
         self.validarQueNoEsteAprobadaPor(materia,estudiante)
         self.validadQueNoEsteAnotadoEn(materia,estudiante)
-        self.validarCorrelativasParaAnotarseA(materia,estudiante)        
+        self.validarRequisitosParaAnotarseA(materia,estudiante)        
     }
 
     // Valida que la "materia" dada pertenezca a una de las carreras
@@ -75,9 +75,9 @@ object sistema {
         }    
     }
 
-    // Valida que el "estudiante" dado tenga aprobadas todas las materias
-    // correlativas para inscribirse en la "materia" dada.
-    method validarCorrelativasParaAnotarseA(materia, estudiante){
+    // Valida que el "estudiante" dado tenga los requisitos
+    // para inscribirse en la "materia" dada.
+    method validarRequisitosParaAnotarseA(materia, estudiante){
         if (!self.tieneLosRequisitosAprobadosPara(materia,estudiante)){
             self.error("El estudiante no tiene las correlativas necesarios para inscribirse a la materia.")
         }
@@ -86,7 +86,7 @@ object sistema {
     // Describe si el "estudiante" dado tiene todas las materias
     // correlativas de la "materia" dada.
     method tieneLosRequisitosAprobadosPara(materia, estudiante){
-        return materia._requisitos_().all({requisito => self.tieneAprobadaA_(estudiante, requisito)})
+        return materia.apruebaRequisito(estudiante)
     }
 
     // Da de baja al "estudiante" dado de la inscripción de la "materia" dada. 
@@ -131,11 +131,24 @@ object sistema {
     method materiasEnLasQueSePuedeAnotar(carrera, estudiante){
         self.validarInscripcionACarrera(carrera, estudiante)
         const todasLasMateriasDe = carrera.materias()
-        return todasLasMateriasDe.filter({materia => self.validarCorrelativasParaAnotarseA(materia, estudiante)})
+        return todasLasMateriasDe.filter({materia => self.validarRequisitosParaAnotarseA(materia, estudiante)})
     }
 
     //Valida que el "estudiante" dado esté inscripto a la "carrera" dada.
     method validarInscripcionACarrera(carrera, estudiante){
         return estudiante.carreras().contains(carrera)
     }
+
+    // Describe las materias de la carrera dada del año dado
+    method materiasDe_AnioDe_(anio, carrera){
+        return carrera.materias().filter({materia => materia.anio()==anio})
+    }
+
+    // Describe las materias aprobadas por "estudiante" de la "carrera" dada
+    method materiasAprobadasDe_(estudiante, carrera){
+        const materiasAprobadas = self.listaDeAprobadasPor(estudiante)
+        return carrera.materias().filter({materia => materiasAprobadas.contains(materia)})        
+    }
+
+    
 }

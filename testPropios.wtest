@@ -4,18 +4,30 @@ import sistema.*
 import materia.*
 import carrera.*
 import aprobado.*
-
+import requisito.* 
 describe "Test de Base de Datos"{
-    const matematica = new Materia()
-    const objetos1 = new Materia()
-    const intro = new Materia()
-    const quimica = new Materia()
+
+    // Requisitos
+    const creditos = new Credito (requisitos=250)
+    const anio1Programacion = new Anio(requisitos = sistema.materiasDe_AnioDe_(1, programacion))
+    const anio2Programacion = new Anio(requisitos = sistema.materiasDe_AnioDe_(2, programacion))
+    const nada = new Nada(requisitos=[]) // Esto quedó raro?
+    const correlativasObjetos2 = new Correlativa(requisitos=#{objetos1})
+ 
+
+    // Materias de Programacion y Carrera
+    const matematica = new Materia(creditos=50, anio=1, _requisitos_=nada)
+    const objetos1 = new Materia(creditos=50, anio=1, _requisitos_=nada)
+    const intro = new Materia(creditos=50, anio=1, _requisitos_=nada)
+    const quimica = new Materia(creditos=50, anio=1, _requisitos_=nada)
     const programacion = new Carrera(materias=#{matematica, intro, objetos1})
     const medicina = new Carrera(materias=#{quimica})
 
+    // Estudiantes
     const sergio = new Estudiante(carreras=#{programacion, medicina})
     const jose = new Estudiante(carreras=#{programacion, medicina})
 
+    // Materias Aprobadas
     const aprobado1 = new Aprobado(materia=matematica, estudiante=sergio, nota=8)
     const aprobado2 = new Aprobado(materia=matematica, estudiante=sergio, nota=5)
     const aprobado3 = new Aprobado(materia=intro, estudiante=sergio, nota=7)
@@ -40,19 +52,29 @@ describe "Test de Base de Datos"{
 }
 
 describe "Test Sistema"{
-    const matematica = new Materia()
-    const objetos1 = new Materia()
-    const objetos2 = new Materia(_requisitos_=#{objetos1})
-    const intro = new Materia()
-    const quimica = new Materia()
+    // Requisitos
+    const creditos = new Credito (requisitos=250)
+    const anio1Programacion = new Anio(requisitos = sistema.materiasDe_AnioDe_(1, programacion))
+    const anio2Programacion = new Anio(requisitos = sistema.materiasDe_AnioDe_(2, programacion))
+    const nada = new Nada(requisitos=[]) // Esto quedó raro?
+    const correlativasObjetos2 = new Correlativa(requisitos=#{objetos1})
+
+    // Materias de Programacion y Carrera
+    const matematica = new Materia(creditos=50, anio=1,  _requisitos_=nada)
+    const objetos1 = new Materia(creditos=50, anio=1,  _requisitos_=nada)
+    const objetos2 = new Materia(_requisitos_=correlativasObjetos2,creditos=50, anio=1)
+    const intro = new Materia(creditos=50, anio=1,  _requisitos_=nada)
+    const quimica = new Materia(creditos=50, anio=1,  _requisitos_=nada)
 
     const programacion = new Carrera(materias=#{matematica, intro, objetos1, objetos2})
     const medicina = new Carrera(materias=#{quimica})
 
+    // Estudiantes
     const sergio = new Estudiante(carreras=#{programacion, medicina})
     const jose = new Estudiante(carreras=#{programacion, medicina})
     const juan = new Estudiante(carreras=#{medicina})
 
+    // Materias aprobadas
     const aprobado1 = new Aprobado(materia=matematica, estudiante=sergio, nota=8)
     const aprobado3 = new Aprobado(materia=intro, estudiante=sergio, nota=7)
     const aprobado4 = new Aprobado(materia=matematica, estudiante=jose, nota=8)
@@ -95,20 +117,29 @@ describe "Test Sistema"{
     }
 
     test "error al validar correlativas de objetos2 para sergio"{
-        assert.throwsException({sistema.validarCorrelativasParaAnotarseA(objetos2, sergio)})
+        assert.throwsException({sistema.validarRequisitosParaAnotarseA(objetos2, sergio)})
     }
 }
 
 describe "Tests de Inscripcion a Materias"{
 
-    const matematica = new Materia()
-    const objetos1 = new Materia()
-    const intro = new Materia()
-    const quimica = new Materia()
-    const biologia1 = new Materia(cupo=1)
+    // Requisitos
+    const creditos = new Credito (requisitos=250)
+    const anio1Programacion = new Anio(requisitos = sistema.materiasDe_AnioDe_(1, programacion))
+    const anio2Programacion = new Anio(requisitos = sistema.materiasDe_AnioDe_(2, programacion))
+    const nada = new Nada(requisitos=[]) // Esto quedó raro?
+    const correlativasObjetos2 = new Correlativa(requisitos=#{objetos1})
+
+    // Materias y Carreras
+    const matematica = new Materia(creditos=50, anio=1,  _requisitos_=nada)
+    const objetos1 = new Materia(creditos=50, anio=1,  _requisitos_=nada)
+    const intro = new Materia(creditos=50, anio=1,  _requisitos_=nada)
+    const quimica = new Materia(creditos=50, anio=1,  _requisitos_=nada)
+    const biologia1 = new Materia(cupo=1, creditos=50, anio=1,_requisitos_=nada)
     const programacion = new Carrera(materias=#{matematica, intro, objetos1})
     const medicina = new Carrera(materias=#{quimica,biologia1})
 
+    // Estudiantes
     const sergio = new Estudiante(carreras=#{programacion, medicina})
     const jose = new Estudiante(carreras=#{medicina})
 

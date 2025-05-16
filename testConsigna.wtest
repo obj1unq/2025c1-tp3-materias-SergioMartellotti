@@ -4,32 +4,49 @@ import estudiante.*
 import baseDeDatos.*
 import aprobado.*
 import sistema.*
+import requisito.*
 
 describe "Tests del sistema de inscripciones"{
+    
+    // Requisitos
+    const creditos = new Credito (requisitos=250)
+    const anio1Programacion = new Anio(requisitos = sistema.materiasDe_AnioDe_(1, programacion))
+    const anio2Programacion = new Anio(requisitos = sistema.materiasDe_AnioDe_(2, programacion))
+    const nada = new Nada(requisitos=[]) // Esto quedó raro?
+    const correlativasObjetos2 = new Correlativa(requisitos=#{objetos1,matematica1})
+    const correlativasObjetos3 = new Correlativa(requisitos=#{objetos2,BBDD})
+    const correlativasConcurrente = new Correlativa(requisitos=#{objetos1,BBDD})
+    const correlativasBiologia2 = new Correlativa(requisitos=#{biologia1})
 
-    const elementosProgramacion = new Materia()
-    const matematica1 = new Materia()
-    const objetos1 = new Materia()
-    const objetos2 = new Materia(_requisitos_= #{matematica1,objetos1}, cupo=3)
-    const BBDD = new Materia()
-    const objetos3 = new Materia(_requisitos_= #{BBDD,objetos2})
-    const concurrente = new Materia(_requisitos_= #{BBDD,objetos1})
-    const tFinal = new Materia()
+ 
+     // Materias de Programacion y Carrera
+    const elementosProgramacion = new Materia(creditos=50, anio=1, _requisitos_=nada)
+    const matematica1 = new Materia(creditos=50, anio=1, _requisitos_=nada)
+    const objetos1 = new Materia(creditos=50, anio=1, _requisitos_=nada)
+    const objetos2 = new Materia(_requisitos_= correlativasObjetos2, cupo=3, creditos=50, anio=2)
+    const BBDD = new Materia(creditos=50, anio=1, _requisitos_=nada)
+    const objetos3 = new Materia(_requisitos_= correlativasObjetos3,creditos=50, anio=2)
+    const concurrente = new Materia(_requisitos_= correlativasConcurrente,creditos=50, anio=2)
+    const tFinal = new Materia(creditos=0, anio=3, _requisitos_=creditos)
     const programacion = new Carrera(materias= #{elementosProgramacion, matematica1, objetos1, objetos2, BBDD, objetos3, concurrente, tFinal})
 
-    const biologia1 = new Materia()
-    const biologia2 = new Materia(_requisitos_= #{biologia1})
-    const quimica = new Materia()
-    const anatomiaGral = new Materia()
+     // Materias de Medicina y Carrera
+    const biologia1 = new Materia(creditos=50, anio=1, _requisitos_=nada)
+    const biologia2 = new Materia(_requisitos_= correlativasBiologia2,creditos=50, anio=2)
+    const quimica = new Materia(creditos=50, anio=1,_requisitos_=nada)
+    const anatomiaGral = new Materia(creditos=50, anio=1, _requisitos_=nada)
     const medicina = new Carrera(materias= #{biologia1, biologia2, quimica, anatomiaGral})
 
-    const latin = new Materia()
-    const dRomano = new Materia()
-    const historiaDArgentino = new Materia()
-    const dPenal1 = new Materia()
-    const dPenal2 = new Materia(_requisitos_= #{dPenal1})
+     // Materias de Derecho y Carrera
+    const latin = new Materia(creditos=50, anio=1, _requisitos_=nada)
+    const dRomano = new Materia(creditos=50, anio=2, _requisitos_=nada)
+    const historiaDArgentino = new Materia(creditos=50, anio=2, _requisitos_=nada)
+    const dPenal1 = new Materia(creditos=50, anio=1, _requisitos_=nada)
+    const dPenal2 = new Materia(_requisitos_= nada ,creditos=50, anio=2)
     const derecho = new Carrera(materias = #{latin, dRomano, historiaDArgentino, dPenal1, dPenal2})
-
+    const anio1Derecho = new Anio(requisitos = sistema.materiasDe_AnioDe_(1, derecho))
+    
+    // Estudiantes y sus aprobadas
     const roque = new Estudiante(carreras= #{programacion, medicina})
     const aprobado1 = new Aprobado(materia=matematica1, estudiante=roque, nota=7)
     const aprobado2 = new Aprobado(materia=objetos1, estudiante=roque, nota=8)
@@ -57,6 +74,7 @@ describe "Tests del sistema de inscripciones"{
     const aprobado12 = new Aprobado(materia=elementosProgramacion, estudiante=ana, nota=9)
 
     method initialize(){
+        dPenal2._requisitos_(anio1Derecho)
         baseDeDatos.registrarAprobado(aprobado1)
         baseDeDatos.registrarAprobado(aprobado2)
         baseDeDatos.registrarAprobado(aprobado3)
@@ -105,6 +123,42 @@ describe "Tests del sistema de inscripciones"{
         sistema.bajaDeInscripcionDe(objetos2, romina)
         assert.equals(3, objetos2.inscriptos().size())
         assert.equals(0, objetos2.enListaDeEspera().size())
+    }
+
+
+    // Tests agregados para Requisitos y las funciones que necesita
+    test "Roque tiene 6 materias aprobadas, 4 son de Proramacion y 2 de Medicina"{
+        assert.equals(6, sistema.listaDeAprobadasPor(roque).size())
+        assert.equals(4, sistema.materiasAprobadasDe_(roque, programacion).size())
+        assert.equals(2, sistema.materiasAprobadasDe_(roque, medicina).size())
+    }
+
+    test "Roque no puede anotarse con 200 creditos a tFinal pero si con 250"{
+        assert.throwsException({sistema.inscribirA_Al_(tFinal, roque)})
+
+        // Se hace aprobar una 5ta materia para llegar a 250 creditos.
+        const aprobado17 = new Aprobado(materia=concurrente, estudiante=roque, nota=9)
+        baseDeDatos.registrarAprobado(aprobado17)
+        assert.doesNotThrowException({sistema.inscribirA_Al_(tFinal, roque)})
+    }
+
+    test "Requisito para anios de carpincho para anotarse a dPenal2"{
+        // Nota dPenal2 tiene como requisito anio1 que representa todas las materias
+        // de primer año de derecho (latin y dPenal1)
+        
+        // Sin materias aprobadas lanza error al intentar anotarse.
+        const carpincho = new Estudiante(carreras= #{derecho})        
+        assert.throwsException({sistema.inscribirA_Al_(dPenal2, carpincho)})
+
+        // Con solo 1 materia de 1ro aprobada lanza error al intentar anotarse.
+        const aprobado18 = new Aprobado(materia=latin, estudiante=carpincho, nota=7)
+        baseDeDatos.registrarAprobado(aprobado18)
+        assert.throwsException({sistema.inscribirA_Al_(dPenal2, carpincho)})
+
+        // Con todas las materias de 1ro aprobadas NO LANZA ERROR.
+        const aprobado19 = new Aprobado(materia=dPenal1, estudiante=carpincho, nota=8)
+        baseDeDatos.registrarAprobado(aprobado19)
+        assert.doesNotThrowException({sistema.inscribirA_Al_(dPenal2, carpincho)})
     }
 }
 
