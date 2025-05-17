@@ -5,9 +5,12 @@ import baseDeDatos.*
 import aprobado.*
 import sistema.*
 import requisito.*
+import listaDeEspera.*
 
 describe "Tests del sistema de inscripciones"{
     
+    // Listas De Espera
+
     // Requisitos
     const creditos = new Credito (requisitos=250)
     const anio1Programacion = new Anio(requisitos = sistema.materiasDe_AnioDe_(1, programacion))
@@ -18,31 +21,31 @@ describe "Tests del sistema de inscripciones"{
     const correlativasConcurrente = new Correlativa(requisitos=#{objetos1,BBDD})
     const correlativasBiologia2 = new Correlativa(requisitos=#{biologia1})
 
- 
+
      // Materias de Programacion y Carrera
-    const elementosProgramacion = new Materia(creditos=50, anio=1, _requisitos_=nada)
-    const matematica1 = new Materia(creditos=50, anio=1, _requisitos_=nada)
-    const objetos1 = new Materia(creditos=50, anio=1, _requisitos_=nada)
-    const objetos2 = new Materia(_requisitos_= correlativasObjetos2, cupo=3, creditos=50, anio=2)
-    const BBDD = new Materia(creditos=50, anio=1, _requisitos_=nada)
-    const objetos3 = new Materia(_requisitos_= correlativasObjetos3,creditos=50, anio=2)
-    const concurrente = new Materia(_requisitos_= correlativasConcurrente,creditos=50, anio=2)
-    const tFinal = new Materia(creditos=0, anio=3, _requisitos_=creditos)
+    const elementosProgramacion = new Materia(creditos=50, anio=1, _requisitos_=nada, enListaDeEspera = new PorOrdenDeLlegada())
+    const matematica1 = new Materia(creditos=50, anio=1, _requisitos_=nada, enListaDeEspera = new PorOrdenDeLlegada())
+    const objetos1 = new Materia(creditos=50, anio=1, _requisitos_=nada, enListaDeEspera = new PorOrdenDeLlegada())
+    const objetos2 = new Materia(_requisitos_= correlativasObjetos2, cupo=3, creditos=50, anio=2, enListaDeEspera = new PorOrdenDeLlegada())
+    const BBDD = new Materia(creditos=50, anio=1, _requisitos_=nada, enListaDeEspera = new PorOrdenDeLlegada())
+    const objetos3 = new Materia(_requisitos_= correlativasObjetos3,creditos=50, anio=2, enListaDeEspera = new PorOrdenDeLlegada())
+    const concurrente = new Materia(_requisitos_= correlativasConcurrente,creditos=50, anio=2, enListaDeEspera = new PorOrdenDeLlegada())
+    const tFinal = new Materia(creditos=0, anio=3, _requisitos_=creditos, enListaDeEspera = new PorOrdenDeLlegada())
     const programacion = new Carrera(materias= #{elementosProgramacion, matematica1, objetos1, objetos2, BBDD, objetos3, concurrente, tFinal})
 
      // Materias de Medicina y Carrera
-    const biologia1 = new Materia(creditos=50, anio=1, _requisitos_=nada)
-    const biologia2 = new Materia(_requisitos_= correlativasBiologia2,creditos=50, anio=2)
-    const quimica = new Materia(creditos=50, anio=1,_requisitos_=nada)
-    const anatomiaGral = new Materia(creditos=50, anio=1, _requisitos_=nada)
+    const biologia1 = new Materia(creditos=50, anio=1, _requisitos_=nada, enListaDeEspera = new PorOrdenDeLlegada())
+    const biologia2 = new Materia(_requisitos_= correlativasBiologia2,creditos=50, anio=2, enListaDeEspera = new PorOrdenDeLlegada())
+    const quimica = new Materia(creditos=50, anio=1,_requisitos_=nada, enListaDeEspera = new PorOrdenDeLlegada())
+    const anatomiaGral = new Materia(creditos=50, anio=1, _requisitos_=nada, enListaDeEspera = new PorOrdenDeLlegada())
     const medicina = new Carrera(materias= #{biologia1, biologia2, quimica, anatomiaGral})
 
      // Materias de Derecho y Carrera
-    const latin = new Materia(creditos=50, anio=1, _requisitos_=nada)
-    const dRomano = new Materia(creditos=50, anio=2, _requisitos_=nada)
-    const historiaDArgentino = new Materia(creditos=50, anio=2, _requisitos_=nada)
-    const dPenal1 = new Materia(creditos=50, anio=1, _requisitos_=nada)
-    const dPenal2 = new Materia(_requisitos_= nada ,creditos=50, anio=2)
+    const latin = new Materia(creditos=50, anio=1, _requisitos_=nada, enListaDeEspera = new PorOrdenDeLlegada())
+    const dRomano = new Materia(creditos=50, anio=2, _requisitos_=nada, enListaDeEspera = new PorOrdenDeLlegada())
+    const historiaDArgentino = new Materia(creditos=50, anio=2, _requisitos_=nada, enListaDeEspera = new PorOrdenDeLlegada())
+    const dPenal1 = new Materia(creditos=50, anio=1, _requisitos_=nada, enListaDeEspera = new PorOrdenDeLlegada())
+    const dPenal2 = new Materia(_requisitos_= nada ,creditos=50, anio=2, enListaDeEspera = new PorOrdenDeLlegada())
     const derecho = new Carrera(materias = #{latin, dRomano, historiaDArgentino, dPenal1, dPenal2})
     const anio1Derecho = new Anio(requisitos = sistema.materiasDe_AnioDe_(1, derecho))
     
@@ -66,12 +69,12 @@ describe "Tests del sistema de inscripciones"{
     const aprobado8 = new Aprobado(materia=elementosProgramacion, estudiante=romina, nota=9)
 
     const alicia = new Estudiante(carreras= #{programacion})
-    const aprobado9 = new Aprobado(materia=matematica1, estudiante=alicia, nota=7)
-    const aprobado10 = new Aprobado(materia=objetos1, estudiante=alicia, nota=8)
+    const aprobado9 = new Aprobado(materia=matematica1, estudiante=alicia, nota=9)
+    const aprobado10 = new Aprobado(materia=objetos1, estudiante=alicia, nota=9)
     const aprobado11 = new Aprobado(materia=elementosProgramacion, estudiante=alicia, nota=9)
 
     const ana = new Estudiante(carreras= #{programacion})
-    const aprobado12 = new Aprobado(materia=elementosProgramacion, estudiante=ana, nota=9)
+    const aprobado12 = new Aprobado(materia=elementosProgramacion, estudiante=ana, nota=7)
 
     method initialize(){
         dPenal2._requisitos_(anio1Derecho)
@@ -112,7 +115,7 @@ describe "Tests del sistema de inscripciones"{
         sistema.inscribirA_Al_(objetos2, roque)
         assert.equals(3, objetos2.inscriptos().size())
         assert.equals(1, objetos2.enListaDeEspera().size())
-        assert.equals(roque, objetos2.enListaDeEspera().first())
+        assert.equals(roque, objetos2.enListaDeEspera().primeroDeLaLista())
     }
 
     test "Se inscriben luisa, romina, alicia y roque a objetos2, romina se da de baja"{
@@ -160,5 +163,87 @@ describe "Tests del sistema de inscripciones"{
         baseDeDatos.registrarAprobado(aprobado19)
         assert.doesNotThrowException({sistema.inscribirA_Al_(dPenal2, carpincho)})
     }
+
+    test "objetos2 tiene ordenDeLlegada y cupo 3, se anotan roque, luisa, romina, alicia, ana. Roque se baja"{
+        // Para que ana pueda anotarse a objetos2
+        const aprobado20 = new Aprobado(materia=objetos1, estudiante=ana, nota=9)
+        const aprobado21 = new Aprobado(materia=matematica1, estudiante=ana, nota=7)
+        baseDeDatos.registrarAprobado(aprobado20)
+        baseDeDatos.registrarAprobado(aprobado21)
+
+        sistema.inscribirA_Al_(objetos2, roque)
+        sistema.inscribirA_Al_(objetos2, luisa)
+        sistema.inscribirA_Al_(objetos2, romina)
+        sistema.inscribirA_Al_(objetos2, alicia)
+        sistema.inscribirA_Al_(objetos2, ana)
+
+        assert.equals(3, objetos2.inscriptos().size())
+        assert.equals(2, objetos2.enListaDeEspera().size())
+        assert.equals(alicia, objetos2.enListaDeEspera().primeroDeLaLista())
+
+        objetos2.bajarInscripcionDe(roque)
+        assert.equals(3, objetos2.inscriptos().size())
+        assert.equals(1, objetos2.enListaDeEspera().size())
+        assert.equals(ana, objetos2.enListaDeEspera().primeroDeLaLista())
+
+    }
+        test "objetos2 tiene elitista y cupo 3, se anotan roque, luisa, romina, alicia, ana. Roque se baja"{
+            // NOTA IMPORTANTE: el promedio de alicia es 9 y el de ana es 7.
+
+        // Para que ana pueda anotarse a objetos2
+        const aprobado20 = new Aprobado(materia=objetos1, estudiante=ana, nota=7)
+        const aprobado21 = new Aprobado(materia=matematica1, estudiante=ana, nota=7)
+        baseDeDatos.registrarAprobado(aprobado20)
+        baseDeDatos.registrarAprobado(aprobado21)
+
+        objetos2.enListaDeEspera(new Elitista())
+        sistema.inscribirA_Al_(objetos2, roque)
+        sistema.inscribirA_Al_(objetos2, luisa)
+        sistema.inscribirA_Al_(objetos2, romina)
+        sistema.inscribirA_Al_(objetos2, alicia)
+        sistema.inscribirA_Al_(objetos2, ana)
+
+        assert.equals(3, objetos2.inscriptos().size())  // 3 anotados
+        assert.equals(2, objetos2.enListaDeEspera().size()) // 2 en lista de espera
+        assert.equals(alicia, objetos2.enListaDeEspera().primeroDeLaLista())    // alicia es la primera
+
+        objetos2.bajarInscripcionDe(roque)     // se baja roque
+
+        assert.equals(3, objetos2.inscriptos().size())  // 3 anotados
+        assert.equals(1, objetos2.enListaDeEspera().size()) // 1 en lista de espera
+        assert.equals(ana, objetos2.enListaDeEspera().primeroDeLaLista())   // queda ana
+
+    }
+
+    test "objetos2 tiene PorAvance y cupo 3, se anotan luisa, romina, alicia, ana, roque. Luisa se baja"{
+            // NOTA IMPORTANTE: roque tiene 4 materias aprobadas contra 3 materias aprobadas de ana.
+
+        // Para que ana pueda anotarse a objetos2
+        const aprobado20 = new Aprobado(materia=objetos1, estudiante=ana, nota=7)
+        const aprobado21 = new Aprobado(materia=matematica1, estudiante=ana, nota=7)
+        baseDeDatos.registrarAprobado(aprobado20)
+        baseDeDatos.registrarAprobado(aprobado21)
+
+        objetos2.enListaDeEspera(new PorAvance())
+        sistema.inscribirA_Al_(objetos2, luisa)
+        sistema.inscribirA_Al_(objetos2, romina)
+        sistema.inscribirA_Al_(objetos2, alicia)
+        sistema.inscribirA_Al_(objetos2, ana)
+        sistema.inscribirA_Al_(objetos2, roque)
+
+        assert.equals(3, objetos2.inscriptos().size())  // 3 anotados
+        assert.equals(2, objetos2.enListaDeEspera().size()) // 2 en lista de espera
+        assert.equals(roque, objetos2.enListaDeEspera().primeroDeLaLista())    // roque es el primero
+
+        objetos2.bajarInscripcionDe(luisa)     // se baja luisa
+
+        assert.equals(3, objetos2.inscriptos().size())  // 3 anotados
+        assert.equals(1, objetos2.enListaDeEspera().size()) // 1 en lista de espera
+        assert.equals(ana, objetos2.enListaDeEspera().primeroDeLaLista())   // queda ana
+
+    }
+
 }
+
+// roque, luisa, romina, alicia, ana
 

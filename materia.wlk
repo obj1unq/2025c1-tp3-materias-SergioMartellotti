@@ -2,7 +2,7 @@ class Materia{
     var property _requisitos_     // Requisitos para anotarse en la materia.
     const cupo = 10                     // Cupo para la inscripción.
     const property inscriptos = #{}     // Estudiantes inscriptos a la materia.
-    const property enListaDeEspera = [] // Estudiantes en lista de espera.
+    var property enListaDeEspera        // Es var para testear
     const creditos
     const anio
 
@@ -12,7 +12,7 @@ class Materia{
         if(self.hayCupo()){
             inscriptos.add(estudiante)
         } else {
-            enListaDeEspera.add(estudiante)
+            enListaDeEspera.agregarALista(estudiante)
         }
     }
 
@@ -32,9 +32,9 @@ class Materia{
     method bajarInscripcionDe(estudiante){
         inscriptos.remove(estudiante)
         if (!enListaDeEspera.isEmpty()){
-            const primeroEnLista = enListaDeEspera.first()
-            self.inscribirA(primeroEnLista)
-            enListaDeEspera.remove(primeroEnLista)
+            const primeroDeLista = enListaDeEspera.primeroDeLaLista()
+            self.inscribirA(primeroDeLista)
+            enListaDeEspera.eleminarEstudiante(primeroDeLista)
         }
     }
 

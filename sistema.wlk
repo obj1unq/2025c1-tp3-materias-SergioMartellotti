@@ -12,7 +12,7 @@ object sistema {
     method promedioNotasDe(estudiante){
         var sumaNotas = 0
         const materiasAprobadas = datos.aprobadasPor_(estudiante)
-        materiasAprobadas.forEach({aprobada => sumaNotas += aprobada.getBasic("nota")})
+        materiasAprobadas.forEach({aprobada => sumaNotas += aprobada.nota()})
         return sumaNotas / materiasAprobadas.size()
     }
 

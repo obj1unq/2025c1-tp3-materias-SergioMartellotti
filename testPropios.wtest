@@ -5,6 +5,7 @@ import materia.*
 import carrera.*
 import aprobado.*
 import requisito.* 
+import listaDeEspera.*
 describe "Test de Base de Datos"{
 
     // Requisitos
@@ -16,10 +17,10 @@ describe "Test de Base de Datos"{
  
 
     // Materias de Programacion y Carrera
-    const matematica = new Materia(creditos=50, anio=1, _requisitos_=nada)
-    const objetos1 = new Materia(creditos=50, anio=1, _requisitos_=nada)
-    const intro = new Materia(creditos=50, anio=1, _requisitos_=nada)
-    const quimica = new Materia(creditos=50, anio=1, _requisitos_=nada)
+    const matematica = new Materia(creditos=50, anio=1, _requisitos_=nada, enListaDeEspera = new PorOrdenDeLlegada())
+    const objetos1 = new Materia(creditos=50, anio=1, _requisitos_=nada, enListaDeEspera = new PorOrdenDeLlegada())
+    const intro = new Materia(creditos=50, anio=1, _requisitos_=nada, enListaDeEspera = new PorOrdenDeLlegada())
+    const quimica = new Materia(creditos=50, anio=1, _requisitos_=nada, enListaDeEspera = new PorOrdenDeLlegada())
     const programacion = new Carrera(materias=#{matematica, intro, objetos1})
     const medicina = new Carrera(materias=#{quimica})
 
@@ -60,11 +61,11 @@ describe "Test Sistema"{
     const correlativasObjetos2 = new Correlativa(requisitos=#{objetos1})
 
     // Materias de Programacion y Carrera
-    const matematica = new Materia(creditos=50, anio=1,  _requisitos_=nada)
-    const objetos1 = new Materia(creditos=50, anio=1,  _requisitos_=nada)
-    const objetos2 = new Materia(_requisitos_=correlativasObjetos2,creditos=50, anio=1)
-    const intro = new Materia(creditos=50, anio=1,  _requisitos_=nada)
-    const quimica = new Materia(creditos=50, anio=1,  _requisitos_=nada)
+    const matematica = new Materia(creditos=50, anio=1,  _requisitos_=nada, enListaDeEspera = new PorOrdenDeLlegada())
+    const objetos1 = new Materia(creditos=50, anio=1,  _requisitos_=nada,enListaDeEspera = new PorOrdenDeLlegada())
+    const objetos2 = new Materia(_requisitos_=correlativasObjetos2,creditos=50, anio=1, enListaDeEspera = new PorOrdenDeLlegada())
+    const intro = new Materia(creditos=50, anio=1,  _requisitos_=nada, enListaDeEspera = new PorOrdenDeLlegada())
+    const quimica = new Materia(creditos=50, anio=1,  _requisitos_=nada, enListaDeEspera = new PorOrdenDeLlegada())
 
     const programacion = new Carrera(materias=#{matematica, intro, objetos1, objetos2})
     const medicina = new Carrera(materias=#{quimica})
@@ -131,11 +132,11 @@ describe "Tests de Inscripcion a Materias"{
     const correlativasObjetos2 = new Correlativa(requisitos=#{objetos1})
 
     // Materias y Carreras
-    const matematica = new Materia(creditos=50, anio=1,  _requisitos_=nada)
-    const objetos1 = new Materia(creditos=50, anio=1,  _requisitos_=nada)
-    const intro = new Materia(creditos=50, anio=1,  _requisitos_=nada)
-    const quimica = new Materia(creditos=50, anio=1,  _requisitos_=nada)
-    const biologia1 = new Materia(cupo=1, creditos=50, anio=1,_requisitos_=nada)
+    const matematica = new Materia(creditos=50, anio=1,  _requisitos_=nada, enListaDeEspera = new PorOrdenDeLlegada())
+    const objetos1 = new Materia(creditos=50, anio=1,  _requisitos_=nada, enListaDeEspera = new PorOrdenDeLlegada())
+    const intro = new Materia(creditos=50, anio=1,  _requisitos_=nada, enListaDeEspera = new PorOrdenDeLlegada())
+    const quimica = new Materia(creditos=50, anio=1,  _requisitos_=nada, enListaDeEspera = new PorOrdenDeLlegada())
+    const biologia1 = new Materia(cupo=1, creditos=50, anio=1,_requisitos_=nada, enListaDeEspera = new PorOrdenDeLlegada())
     const programacion = new Carrera(materias=#{matematica, intro, objetos1})
     const medicina = new Carrera(materias=#{quimica,biologia1})
 
@@ -187,9 +188,10 @@ describe "Tests de Inscripcion a Materias"{
         sistema.inscribirA_Al_(quimica, jose)
         sistema.inscribirA_Al_(biologia1, sergio)
         sistema.inscribirA_Al_(biologia1, jose)        
+
         assert.equals(3, sistema.materiasEnLasQueEstaInscripto(sergio).size())
+        assert.equals(1, sistema.materiasEnLasQueEstaInscripto(jose).size())
         assert.equals(0,sistema.materiasEnLasQueEstaEnListaDeEspera(sergio).size())
         assert.equals(1,sistema.materiasEnLasQueEstaEnListaDeEspera(jose).size())
-
     }
 }
