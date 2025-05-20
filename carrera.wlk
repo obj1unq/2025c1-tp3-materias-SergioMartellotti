@@ -7,4 +7,9 @@ class Carrera{
     method contieneALa_(materia){
         return materias.contains(materia)
     }
+
+    // Describe las materias del año dado.
+    method materiasDe_Anio(anio){
+        return self.materias().filter({materia => materia.anio()==anio})
+    }
 }

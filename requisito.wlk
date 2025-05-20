@@ -1,4 +1,5 @@
-import sistema.*
+import estudiante.*
+import carrera.*
 
 class Requisito{
     var requisitos
@@ -11,7 +12,7 @@ class Correlativa inherits Requisito{
     // Indica si el "estudiante" dado tiene las materias como requisito
     // aprobadas.
     override method apruebaRequisito(materia, estudiante){
-        return requisitos.all({requisito => sistema.tieneAprobadaA_(estudiante, requisito)})
+        return requisitos.all({requisito => estudiante.tieneAprobadaA_(requisito)})
     }
 }
 
@@ -26,7 +27,7 @@ class Credito inherits Requisito{
 
     method sumaDeCreditos(carrera,estudiante){
         var suma = 0
-        sistema.materiasAprobadasDe_(estudiante,carrera).forEach({materia => suma += materia.creditos()})
+        estudiante.materiasAprobadasDe_(carrera).forEach({materia => suma += materia.creditos()})
         return suma
     }
 }
@@ -36,7 +37,7 @@ class Anio inherits Requisito{
         requisitos = _requisitos
     }
     override method apruebaRequisito(materia, estudiante){
-        const materiasAprobadas = sistema.listaDeAprobadasPor(estudiante)
+        const materiasAprobadas = estudiante.materiasAprobadas()
         return requisitos.all({materia => materiasAprobadas.contains(materia)})
     }
 }

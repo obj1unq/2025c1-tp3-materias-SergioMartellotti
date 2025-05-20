@@ -1,11 +1,8 @@
 import materia.*
 import carrera.*
 import estudiante.*
-import baseDeDatos.*
-import aprobado.*
-import sistema.*
+
 import requisito.*
-import listaDeEspera.*
 
 describe "Tests del sistema de inscripciones"{
     
@@ -13,8 +10,8 @@ describe "Tests del sistema de inscripciones"{
 
     // Requisitos
     const creditos = new Credito (requisitos=250)
-    const anio1Programacion = new Anio(requisitos = sistema.materiasDe_AnioDe_(1, programacion))
-    const anio2Programacion = new Anio(requisitos = sistema.materiasDe_AnioDe_(2, programacion))
+    const anio1Programacion = new Anio(requisitos = programacion.materiasDe_Anio(1))
+    const anio2Programacion = new Anio(requisitos = programacion.materiasDe_Anio(2))
     const nada = new Nada(requisitos=[]) // Esto quedó raro?
     const correlativasObjetos2 = new Correlativa(requisitos=#{objetos1,matematica1})
     const correlativasObjetos3 = new Correlativa(requisitos=#{objetos2,BBDD})
@@ -23,117 +20,97 @@ describe "Tests del sistema de inscripciones"{
 
 
      // Materias de Programacion y Carrera
-    const elementosProgramacion = new Materia(creditos=50, anio=1, _requisitos_=nada, enListaDeEspera = new PorOrdenDeLlegada())
-    const matematica1 = new Materia(creditos=50, anio=1, _requisitos_=nada, enListaDeEspera = new PorOrdenDeLlegada())
-    const objetos1 = new Materia(creditos=50, anio=1, _requisitos_=nada, enListaDeEspera = new PorOrdenDeLlegada())
-    const objetos2 = new Materia(_requisitos_= correlativasObjetos2, cupo=3, creditos=50, anio=2, enListaDeEspera = new PorOrdenDeLlegada())
-    const BBDD = new Materia(creditos=50, anio=1, _requisitos_=nada, enListaDeEspera = new PorOrdenDeLlegada())
-    const objetos3 = new Materia(_requisitos_= correlativasObjetos3,creditos=50, anio=2, enListaDeEspera = new PorOrdenDeLlegada())
-    const concurrente = new Materia(_requisitos_= correlativasConcurrente,creditos=50, anio=2, enListaDeEspera = new PorOrdenDeLlegada())
-    const tFinal = new Materia(creditos=0, anio=3, _requisitos_=creditos, enListaDeEspera = new PorOrdenDeLlegada())
+    const elementosProgramacion = new Materia(creditos=50, anio=1, _requisitos_=nada, metodoDeOrdenamiento = porOrdenDeLlegada)
+    const matematica1 = new Materia(creditos=50, anio=1, _requisitos_=nada, metodoDeOrdenamiento = porOrdenDeLlegada)
+    const objetos1 = new Materia(creditos=50, anio=1, _requisitos_=nada, metodoDeOrdenamiento = porOrdenDeLlegada)
+    const objetos2 = new Materia(_requisitos_= correlativasObjetos2, cupo=3, creditos=50, anio=2, metodoDeOrdenamiento = porOrdenDeLlegada)
+    const BBDD = new Materia(creditos=50, anio=1, _requisitos_=nada, metodoDeOrdenamiento = porOrdenDeLlegada)
+    const objetos3 = new Materia(_requisitos_= correlativasObjetos3,creditos=50, anio=2, metodoDeOrdenamiento = porOrdenDeLlegada)
+    const concurrente = new Materia(_requisitos_= correlativasConcurrente,creditos=50, anio=2, metodoDeOrdenamiento = porOrdenDeLlegada)
+    const tFinal = new Materia(creditos=0, anio=3, _requisitos_=creditos, metodoDeOrdenamiento = porOrdenDeLlegada)
     const programacion = new Carrera(materias= #{elementosProgramacion, matematica1, objetos1, objetos2, BBDD, objetos3, concurrente, tFinal})
 
      // Materias de Medicina y Carrera
-    const biologia1 = new Materia(creditos=50, anio=1, _requisitos_=nada, enListaDeEspera = new PorOrdenDeLlegada())
-    const biologia2 = new Materia(_requisitos_= correlativasBiologia2,creditos=50, anio=2, enListaDeEspera = new PorOrdenDeLlegada())
-    const quimica = new Materia(creditos=50, anio=1,_requisitos_=nada, enListaDeEspera = new PorOrdenDeLlegada())
-    const anatomiaGral = new Materia(creditos=50, anio=1, _requisitos_=nada, enListaDeEspera = new PorOrdenDeLlegada())
+    const biologia1 = new Materia(creditos=50, anio=1, _requisitos_=nada, metodoDeOrdenamiento = porOrdenDeLlegada)
+    const biologia2 = new Materia(_requisitos_= correlativasBiologia2,creditos=50, anio=2, metodoDeOrdenamiento = porOrdenDeLlegada)
+    const quimica = new Materia(creditos=50, anio=1,_requisitos_=nada, metodoDeOrdenamiento = porOrdenDeLlegada)
+    const anatomiaGral = new Materia(creditos=50, anio=1, _requisitos_=nada, metodoDeOrdenamiento = porOrdenDeLlegada)
     const medicina = new Carrera(materias= #{biologia1, biologia2, quimica, anatomiaGral})
 
      // Materias de Derecho y Carrera
-    const latin = new Materia(creditos=50, anio=1, _requisitos_=nada, enListaDeEspera = new PorOrdenDeLlegada())
-    const dRomano = new Materia(creditos=50, anio=2, _requisitos_=nada, enListaDeEspera = new PorOrdenDeLlegada())
-    const historiaDArgentino = new Materia(creditos=50, anio=2, _requisitos_=nada, enListaDeEspera = new PorOrdenDeLlegada())
-    const dPenal1 = new Materia(creditos=50, anio=1, _requisitos_=nada, enListaDeEspera = new PorOrdenDeLlegada())
-    const dPenal2 = new Materia(_requisitos_= nada ,creditos=50, anio=2, enListaDeEspera = new PorOrdenDeLlegada())
+    const latin = new Materia(creditos=50, anio=1, _requisitos_=nada, metodoDeOrdenamiento = porOrdenDeLlegada)
+    const dRomano = new Materia(creditos=50, anio=2, _requisitos_=nada, metodoDeOrdenamiento = porOrdenDeLlegada)
+    const historiaDArgentino = new Materia(creditos=50, anio=2, _requisitos_=nada, metodoDeOrdenamiento = porOrdenDeLlegada)
+    const dPenal1 = new Materia(creditos=50, anio=1, _requisitos_=nada, metodoDeOrdenamiento = porOrdenDeLlegada)
+    const dPenal2 = new Materia(_requisitos_= nada ,creditos=50, anio=2, metodoDeOrdenamiento = porOrdenDeLlegada)
     const derecho = new Carrera(materias = #{latin, dRomano, historiaDArgentino, dPenal1, dPenal2})
-    const anio1Derecho = new Anio(requisitos = sistema.materiasDe_AnioDe_(1, derecho))
+    const anio1Derecho = new Anio(requisitos = derecho.materiasDe_Anio(1))
     
-    // Estudiantes y sus aprobadas
+    // Estudiantes
     const roque = new Estudiante(carreras= #{programacion, medicina})
-    const aprobado1 = new Aprobado(materia=matematica1, estudiante=roque, nota=7)
-    const aprobado2 = new Aprobado(materia=objetos1, estudiante=roque, nota=8)
-    const aprobado13 = new Aprobado(materia=elementosProgramacion, estudiante=roque, nota=9)
-    const aprobado14 = new Aprobado(materia=BBDD, estudiante=roque, nota=9)
-    const aprobado15 = new Aprobado(materia=quimica, estudiante=roque, nota=9)
-    const aprobado16 = new Aprobado(materia=biologia1, estudiante=roque, nota=9)
-
     const luisa = new Estudiante(carreras= #{programacion})
-    const aprobado3 = new Aprobado(materia=matematica1, estudiante=luisa, nota=7)
-    const aprobado4 = new Aprobado(materia=objetos1, estudiante=luisa, nota=8)
-    const aprobado5 = new Aprobado(materia=elementosProgramacion, estudiante=luisa, nota=9)
-
     const romina = new Estudiante(carreras= #{programacion})
-    const aprobado6 = new Aprobado(materia=matematica1, estudiante=romina, nota=7)
-    const aprobado7 = new Aprobado(materia=objetos1, estudiante=romina, nota=8)
-    const aprobado8 = new Aprobado(materia=elementosProgramacion, estudiante=romina, nota=9)
-
     const alicia = new Estudiante(carreras= #{programacion})
-    const aprobado9 = new Aprobado(materia=matematica1, estudiante=alicia, nota=9)
-    const aprobado10 = new Aprobado(materia=objetos1, estudiante=alicia, nota=9)
-    const aprobado11 = new Aprobado(materia=elementosProgramacion, estudiante=alicia, nota=9)
-
     const ana = new Estudiante(carreras= #{programacion})
-    const aprobado12 = new Aprobado(materia=elementosProgramacion, estudiante=ana, nota=7)
 
     method initialize(){
         dPenal2._requisitos_(anio1Derecho)
-        baseDeDatos.registrarAprobado(aprobado1)
-        baseDeDatos.registrarAprobado(aprobado2)
-        baseDeDatos.registrarAprobado(aprobado3)
-        baseDeDatos.registrarAprobado(aprobado4)
-        baseDeDatos.registrarAprobado(aprobado5)
-        baseDeDatos.registrarAprobado(aprobado6)
-        baseDeDatos.registrarAprobado(aprobado7)
-        baseDeDatos.registrarAprobado(aprobado8)
-        baseDeDatos.registrarAprobado(aprobado9)
-        baseDeDatos.registrarAprobado(aprobado10)
-        baseDeDatos.registrarAprobado(aprobado11)
-        baseDeDatos.registrarAprobado(aprobado12)
-        baseDeDatos.registrarAprobado(aprobado13)
-        baseDeDatos.registrarAprobado(aprobado14)
-        baseDeDatos.registrarAprobado(aprobado15)
-        baseDeDatos.registrarAprobado(aprobado16)
+        roque.aprobarMateria(new Aprobado(materia=matematica1, nota=7))
+        roque.aprobarMateria(new Aprobado(materia=objetos1, nota=8))
+        luisa.aprobarMateria(new Aprobado(materia=matematica1, nota=7))
+        luisa.aprobarMateria(new Aprobado(materia=objetos1,  nota=8))
+        luisa.aprobarMateria(new Aprobado(materia=elementosProgramacion, nota=9))
+        romina.aprobarMateria(new Aprobado(materia=matematica1, nota=7))
+        romina.aprobarMateria(new Aprobado(materia=objetos1, nota=8))
+        romina.aprobarMateria(new Aprobado(materia=elementosProgramacion, nota=9))
+        alicia.aprobarMateria(new Aprobado(materia=matematica1, nota=9))
+        alicia.aprobarMateria(new Aprobado(materia=objetos1,nota=9))
+        alicia.aprobarMateria(new Aprobado(materia=elementosProgramacion, nota=9))
+        ana.aprobarMateria( new Aprobado(materia=elementosProgramacion, nota=7))
+        roque.aprobarMateria(new Aprobado(materia=elementosProgramacion, nota=9))
+        roque.aprobarMateria(new Aprobado(materia=BBDD, nota=9))
+        roque.aprobarMateria(new Aprobado(materia=quimica, nota=9))
+        roque.aprobarMateria(new Aprobado(materia=biologia1, nota=9))
     }
 
     test "Roque puede inscribirse en objetos2 pero no en objetos3 ni en objetos1"{
-        assert.doesNotThrowException({sistema.inscribirA_Al_(objetos2, roque)})
-        assert.throwsException({sistema.inscribirA_Al_(objetos1, roque)})
-        assert.throwsException({sistema.inscribirA_Al_(objetos3, roque)})
+        assert.doesNotThrowException({roque.inscribirA_(objetos2)})
+        assert.throwsException({roque.inscribirA_(objetos1)})
+        assert.throwsException({roque.inscribirA_(objetos3)})
     }
 
     test "Roque puede inscribirse en elementosProgramacion, objetos2 y concurrente"{
-        assert.doesNotThrowException({sistema.inscribirA_Al_(objetos2, roque)})
-        assert.doesNotThrowException({sistema.inscribirA_Al_(concurrente, roque)})
-        assert.doesNotThrowException({sistema.inscribirA_Al_(biologia2, roque)})
+        assert.doesNotThrowException({roque.inscribirA_(objetos2)})
+        assert.doesNotThrowException({roque.inscribirA_(concurrente)})
+        assert.doesNotThrowException({roque.inscribirA_(biologia2)})
     }    
 
     test "Se inscriben luisa, romina, alicia y roque a objetos2"{
-        sistema.inscribirA_Al_(objetos2, luisa)
-        sistema.inscribirA_Al_(objetos2, romina)
-        sistema.inscribirA_Al_(objetos2, alicia)
-        sistema.inscribirA_Al_(objetos2, roque)
-        assert.equals(3, objetos2.inscriptos().size())
-        assert.equals(1, objetos2.enListaDeEspera().size())
-        assert.equals(roque, objetos2.enListaDeEspera().primeroDeLaLista())
+        luisa.inscribirA_(objetos2)
+        romina.inscribirA_(objetos2)
+        alicia.inscribirA_(objetos2)
+        roque.inscribirA_(objetos2)
+        assert.equals(3, objetos2.estudiantesInscriptos().size())
+        assert.equals(1, objetos2.estudiantesEnListaDeEsperaDe().size())
+        assert.equals(roque, objetos2.metodoDeOrdenamiento().primeroDeLaLista(objetos2.estudiantesEnListaDeEsperaDe()))
     }
 
     test "Se inscriben luisa, romina, alicia y roque a objetos2, romina se da de baja"{
-        sistema.inscribirA_Al_(objetos2, luisa)
-        sistema.inscribirA_Al_(objetos2, romina)
-        sistema.inscribirA_Al_(objetos2, alicia)
-        sistema.inscribirA_Al_(objetos2, roque)
-        sistema.bajaDeInscripcionDe(objetos2, romina)
-        assert.equals(3, objetos2.inscriptos().size())
-        assert.equals(0, objetos2.enListaDeEspera().size())
+        luisa.inscribirA_(objetos2)
+        romina.inscribirA_(objetos2)
+        alicia.inscribirA_(objetos2)
+        roque.inscribirA_(objetos2)
+        romina.bajaDeInscripcionDe(objetos2)
+        assert.equals(3, objetos2.estudiantesInscriptos().size())
+        assert.equals(0, objetos2.estudiantesEnListaDeEsperaDe().size())
     }
 
 
     // Tests agregados para Requisitos y las funciones que necesita
     test "Roque tiene 6 materias aprobadas, 4 son de Proramacion y 2 de Medicina"{
-        assert.equals(6, sistema.listaDeAprobadasPor(roque).size())
-        assert.equals(4, sistema.materiasAprobadasDe_(roque, programacion).size())
-        assert.equals(2, sistema.materiasAprobadasDe_(roque, medicina).size())
+        assert.equals(6, roque.listaDeAprobadas().size())
+        assert.equals(4, roque.materiasAprobadasDe_(programacion).size())
+        assert.equals(2, roque.materiasAprobadasDe_(medicina).size())
     }
 
     test "Roque no puede anotarse con 200 creditos a tFinal pero si con 250"{
@@ -196,7 +173,7 @@ describe "Tests del sistema de inscripciones"{
         baseDeDatos.registrarAprobado(aprobado20)
         baseDeDatos.registrarAprobado(aprobado21)
 
-        objetos2.enListaDeEspera(new Elitista())
+        objetos2.enListaDeEspera(elitista)
         sistema.inscribirA_Al_(objetos2, roque)
         sistema.inscribirA_Al_(objetos2, luisa)
         sistema.inscribirA_Al_(objetos2, romina)
@@ -224,7 +201,7 @@ describe "Tests del sistema de inscripciones"{
         baseDeDatos.registrarAprobado(aprobado20)
         baseDeDatos.registrarAprobado(aprobado21)
 
-        objetos2.enListaDeEspera(new PorAvance())
+        objetos2.enListaDeEspera(porAvance)
         sistema.inscribirA_Al_(objetos2, luisa)
         sistema.inscribirA_Al_(objetos2, romina)
         sistema.inscribirA_Al_(objetos2, alicia)
