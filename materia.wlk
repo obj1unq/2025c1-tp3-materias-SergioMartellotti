@@ -84,7 +84,7 @@ object porOrdenDeLlegada{
 object elitista{
 
     method primeroDeLaLista(lista){
-        return lista.maxIfEmpty({estudiante => estudiante.promedioNotasDe()}, {[]})
+        return lista.maxIfEmpty({estudiante => estudiante.promedioNotas()}, {[]})
     }
 }
 

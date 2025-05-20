@@ -108,18 +108,18 @@ describe "Tests del sistema de inscripciones"{
 
     // Tests agregados para Requisitos y las funciones que necesita
     test "Roque tiene 6 materias aprobadas, 4 son de Proramacion y 2 de Medicina"{
-        assert.equals(6, roque.listaDeAprobadas().size())
+        assert.equals(6, roque.cantidadDeAprobadas())
         assert.equals(4, roque.materiasAprobadasDe_(programacion).size())
         assert.equals(2, roque.materiasAprobadasDe_(medicina).size())
     }
 
     test "Roque no puede anotarse con 200 creditos a tFinal pero si con 250"{
-        assert.throwsException({sistema.inscribirA_Al_(tFinal, roque)})
+        assert.throwsException({roque.inscribirA_(tFinal)})
 
         // Se hace aprobar una 5ta materia para llegar a 250 creditos.
-        const aprobado17 = new Aprobado(materia=concurrente, estudiante=roque, nota=9)
-        baseDeDatos.registrarAprobado(aprobado17)
-        assert.doesNotThrowException({sistema.inscribirA_Al_(tFinal, roque)})
+        const aprobado17 = new Aprobado(materia=concurrente,nota=9)
+        roque.aprobarMateria(aprobado17)
+        assert.doesNotThrowException({roque.inscribirA_(tFinal)})
     }
 
     test "Requisito para anios de carpincho para anotarse a dPenal2"{
@@ -128,67 +128,67 @@ describe "Tests del sistema de inscripciones"{
         
         // Sin materias aprobadas lanza error al intentar anotarse.
         const carpincho = new Estudiante(carreras= #{derecho})        
-        assert.throwsException({sistema.inscribirA_Al_(dPenal2, carpincho)})
+        assert.throwsException({carpincho.inscribirA_(dPenal2)})
 
         // Con solo 1 materia de 1ro aprobada lanza error al intentar anotarse.
-        const aprobado18 = new Aprobado(materia=latin, estudiante=carpincho, nota=7)
-        baseDeDatos.registrarAprobado(aprobado18)
-        assert.throwsException({sistema.inscribirA_Al_(dPenal2, carpincho)})
+        const aprobado18 = new Aprobado(materia=latin, nota=7)
+        carpincho.aprobarMateria(aprobado18)
+        assert.throwsException({carpincho.inscribirA_(dPenal2)})
 
         // Con todas las materias de 1ro aprobadas NO LANZA ERROR.
-        const aprobado19 = new Aprobado(materia=dPenal1, estudiante=carpincho, nota=8)
-        baseDeDatos.registrarAprobado(aprobado19)
-        assert.doesNotThrowException({sistema.inscribirA_Al_(dPenal2, carpincho)})
+        const aprobado19 = new Aprobado(materia=dPenal1, nota=8)
+        carpincho.aprobarMateria(aprobado19)
+        assert.doesNotThrowException({carpincho.inscribirA_(dPenal2)})
     }
 
     test "objetos2 tiene ordenDeLlegada y cupo 3, se anotan roque, luisa, romina, alicia, ana. Roque se baja"{
         // Para que ana pueda anotarse a objetos2
-        const aprobado20 = new Aprobado(materia=objetos1, estudiante=ana, nota=9)
-        const aprobado21 = new Aprobado(materia=matematica1, estudiante=ana, nota=7)
-        baseDeDatos.registrarAprobado(aprobado20)
-        baseDeDatos.registrarAprobado(aprobado21)
+        const aprobado20 = new Aprobado(materia=objetos1, nota=9)
+        const aprobado21 = new Aprobado(materia=matematica1, nota=7)
+        ana.aprobarMateria(aprobado20)
+        ana.aprobarMateria(aprobado21)
 
-        sistema.inscribirA_Al_(objetos2, roque)
-        sistema.inscribirA_Al_(objetos2, luisa)
-        sistema.inscribirA_Al_(objetos2, romina)
-        sistema.inscribirA_Al_(objetos2, alicia)
-        sistema.inscribirA_Al_(objetos2, ana)
+        roque.inscribirA_(objetos2)
+        luisa.inscribirA_(objetos2)
+        romina.inscribirA_(objetos2)
+        alicia.inscribirA_(objetos2)
+        ana.inscribirA_(objetos2)
 
-        assert.equals(3, objetos2.inscriptos().size())
-        assert.equals(2, objetos2.enListaDeEspera().size())
-        assert.equals(alicia, objetos2.enListaDeEspera().primeroDeLaLista())
+        assert.equals(3, objetos2.estudiantesInscriptos().size())
+        assert.equals(2, objetos2.estudiantesEnListaDeEsperaDe().size())
+        assert.equals(alicia, objetos2.metodoDeOrdenamiento().primeroDeLaLista(objetos2.estudiantesEnListaDeEsperaDe()))
 
         objetos2.bajarInscripcionDe(roque)
-        assert.equals(3, objetos2.inscriptos().size())
-        assert.equals(1, objetos2.enListaDeEspera().size())
-        assert.equals(ana, objetos2.enListaDeEspera().primeroDeLaLista())
+        assert.equals(3, objetos2.estudiantesInscriptos().size())
+        assert.equals(1, objetos2.estudiantesEnListaDeEsperaDe().size())
+        assert.equals(ana, objetos2.metodoDeOrdenamiento().primeroDeLaLista(objetos2.estudiantesEnListaDeEsperaDe()))
 
     }
         test "objetos2 tiene elitista y cupo 3, se anotan roque, luisa, romina, alicia, ana. Roque se baja"{
             // NOTA IMPORTANTE: el promedio de alicia es 9 y el de ana es 7.
 
         // Para que ana pueda anotarse a objetos2
-        const aprobado20 = new Aprobado(materia=objetos1, estudiante=ana, nota=7)
-        const aprobado21 = new Aprobado(materia=matematica1, estudiante=ana, nota=7)
-        baseDeDatos.registrarAprobado(aprobado20)
-        baseDeDatos.registrarAprobado(aprobado21)
+        const aprobado20 = new Aprobado(materia=objetos1, nota=7)
+        const aprobado21 = new Aprobado(materia=matematica1, nota=7)
+        ana.aprobarMateria(aprobado20)
+        ana.aprobarMateria(aprobado21)
 
-        objetos2.enListaDeEspera(elitista)
-        sistema.inscribirA_Al_(objetos2, roque)
-        sistema.inscribirA_Al_(objetos2, luisa)
-        sistema.inscribirA_Al_(objetos2, romina)
-        sistema.inscribirA_Al_(objetos2, alicia)
-        sistema.inscribirA_Al_(objetos2, ana)
+        objetos2.metodoDeOrdenamiento(elitista)
+        roque.inscribirA_(objetos2)
+        luisa.inscribirA_(objetos2)
+        romina.inscribirA_(objetos2)
+        alicia.inscribirA_(objetos2)
+        ana.inscribirA_(objetos2)
 
-        assert.equals(3, objetos2.inscriptos().size())  // 3 anotados
-        assert.equals(2, objetos2.enListaDeEspera().size()) // 2 en lista de espera
-        assert.equals(alicia, objetos2.enListaDeEspera().primeroDeLaLista())    // alicia es la primera
+        assert.equals(3, objetos2.estudiantesInscriptos().size())  // 3 anotados
+        assert.equals(2, objetos2.estudiantesEnListaDeEsperaDe().size()) // 2 en lista de espera
+        assert.equals(alicia, objetos2.metodoDeOrdenamiento().primeroDeLaLista(objetos2.estudiantesEnListaDeEsperaDe()))    // alicia es la primera
 
         objetos2.bajarInscripcionDe(roque)     // se baja roque
 
-        assert.equals(3, objetos2.inscriptos().size())  // 3 anotados
-        assert.equals(1, objetos2.enListaDeEspera().size()) // 1 en lista de espera
-        assert.equals(ana, objetos2.enListaDeEspera().primeroDeLaLista())   // queda ana
+        assert.equals(3, objetos2.estudiantesInscriptos().size())  // 3 anotados
+        assert.equals(1, objetos2.estudiantesEnListaDeEsperaDe().size()) // 1 en lista de espera
+        assert.equals(ana, objetos2.metodoDeOrdenamiento().primeroDeLaLista(objetos2.estudiantesEnListaDeEsperaDe()))    // queda ana
 
     }
 
@@ -196,31 +196,28 @@ describe "Tests del sistema de inscripciones"{
             // NOTA IMPORTANTE: roque tiene 4 materias aprobadas contra 3 materias aprobadas de ana.
 
         // Para que ana pueda anotarse a objetos2
-        const aprobado20 = new Aprobado(materia=objetos1, estudiante=ana, nota=7)
-        const aprobado21 = new Aprobado(materia=matematica1, estudiante=ana, nota=7)
-        baseDeDatos.registrarAprobado(aprobado20)
-        baseDeDatos.registrarAprobado(aprobado21)
+        const aprobado20 = new Aprobado(materia=objetos1, nota=7)
+        const aprobado21 = new Aprobado(materia=matematica1, nota=7)
+        ana.aprobarMateria(aprobado20)
+        ana.aprobarMateria(aprobado21)
 
-        objetos2.enListaDeEspera(porAvance)
-        sistema.inscribirA_Al_(objetos2, luisa)
-        sistema.inscribirA_Al_(objetos2, romina)
-        sistema.inscribirA_Al_(objetos2, alicia)
-        sistema.inscribirA_Al_(objetos2, ana)
-        sistema.inscribirA_Al_(objetos2, roque)
-
-        assert.equals(3, objetos2.inscriptos().size())  // 3 anotados
-        assert.equals(2, objetos2.enListaDeEspera().size()) // 2 en lista de espera
-        assert.equals(roque, objetos2.enListaDeEspera().primeroDeLaLista())    // roque es el primero
+        objetos2.metodoDeOrdenamiento(porAvance)
+        luisa.inscribirA_(objetos2)
+        romina.inscribirA_(objetos2)
+        alicia.inscribirA_(objetos2)
+        ana.inscribirA_(objetos2)
+        roque.inscribirA_(objetos2)
+        
+        assert.equals(3, objetos2.estudiantesInscriptos().size())  // 3 anotados
+        assert.equals(2, objetos2.estudiantesEnListaDeEsperaDe().size()) // 2 en lista de espera
+        assert.equals(roque,objetos2.metodoDeOrdenamiento().primeroDeLaLista(objetos2.estudiantesEnListaDeEsperaDe()))    // roque es el primero
 
         objetos2.bajarInscripcionDe(luisa)     // se baja luisa
 
-        assert.equals(3, objetos2.inscriptos().size())  // 3 anotados
-        assert.equals(1, objetos2.enListaDeEspera().size()) // 1 en lista de espera
-        assert.equals(ana, objetos2.enListaDeEspera().primeroDeLaLista())   // queda ana
+        assert.equals(3, objetos2.estudiantesInscriptos().size())  // 3 anotados
+        assert.equals(1, objetos2.estudiantesEnListaDeEsperaDe().size()) // 1 en lista de espera
+        assert.equals(ana,objetos2.metodoDeOrdenamiento().primeroDeLaLista(objetos2.estudiantesEnListaDeEsperaDe()))    // queda ana
 
     }
 
 }
-
-// roque, luisa, romina, alicia, ana
-

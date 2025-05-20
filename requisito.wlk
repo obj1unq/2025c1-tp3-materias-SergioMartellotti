@@ -37,7 +37,7 @@ class Anio inherits Requisito{
         requisitos = _requisitos
     }
     override method apruebaRequisito(materia, estudiante){
-        const materiasAprobadas = estudiante.materiasAprobadas()
+        const materiasAprobadas = estudiante.listaDeAprobadas()
         return requisitos.all({materia => materiasAprobadas.contains(materia)})
     }
 }

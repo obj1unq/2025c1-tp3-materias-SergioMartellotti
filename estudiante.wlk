@@ -129,7 +129,8 @@ class Estudiante{
 
     // Describe las materias aprobadas de la "carrera" dada.
     method materiasAprobadasDe_(carrera){
-        return materiasAprobadas.filter({materia => carrera.contieneALa_(materia)})
+        const listaDeAprobadas = self.listaDeAprobadas()
+        return listaDeAprobadas.filter({materia => carrera.contieneALa_(materia)})
     }
 }
 
