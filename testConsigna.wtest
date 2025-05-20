@@ -1,0 +1,223 @@
+import materia.*
+import carrera.*
+import estudiante.*
+
+import requisito.*
+
+describe "Tests del sistema de inscripciones"{
+    
+    // Listas De Espera
+
+    // Requisitos
+    const creditos = new Credito (requisitos=250)
+    const anio1Programacion = new Anio(requisitos = programacion.materiasDe_Anio(1))
+    const anio2Programacion = new Anio(requisitos = programacion.materiasDe_Anio(2))
+    const nada = new Nada(requisitos=[]) // Esto quedó raro?
+    const correlativasObjetos2 = new Correlativa(requisitos=#{objetos1,matematica1})
+    const correlativasObjetos3 = new Correlativa(requisitos=#{objetos2,BBDD})
+    const correlativasConcurrente = new Correlativa(requisitos=#{objetos1,BBDD})
+    const correlativasBiologia2 = new Correlativa(requisitos=#{biologia1})
+
+
+     // Materias de Programacion y Carrera
+    const elementosProgramacion = new Materia(creditos=50, anio=1, _requisitos_=nada, metodoDeOrdenamiento = porOrdenDeLlegada)
+    const matematica1 = new Materia(creditos=50, anio=1, _requisitos_=nada, metodoDeOrdenamiento = porOrdenDeLlegada)
+    const objetos1 = new Materia(creditos=50, anio=1, _requisitos_=nada, metodoDeOrdenamiento = porOrdenDeLlegada)
+    const objetos2 = new Materia(_requisitos_= correlativasObjetos2, cupo=3, creditos=50, anio=2, metodoDeOrdenamiento = porOrdenDeLlegada)
+    const BBDD = new Materia(creditos=50, anio=1, _requisitos_=nada, metodoDeOrdenamiento = porOrdenDeLlegada)
+    const objetos3 = new Materia(_requisitos_= correlativasObjetos3,creditos=50, anio=2, metodoDeOrdenamiento = porOrdenDeLlegada)
+    const concurrente = new Materia(_requisitos_= correlativasConcurrente,creditos=50, anio=2, metodoDeOrdenamiento = porOrdenDeLlegada)
+    const tFinal = new Materia(creditos=0, anio=3, _requisitos_=creditos, metodoDeOrdenamiento = porOrdenDeLlegada)
+    const programacion = new Carrera(materias= #{elementosProgramacion, matematica1, objetos1, objetos2, BBDD, objetos3, concurrente, tFinal})
+
+     // Materias de Medicina y Carrera
+    const biologia1 = new Materia(creditos=50, anio=1, _requisitos_=nada, metodoDeOrdenamiento = porOrdenDeLlegada)
+    const biologia2 = new Materia(_requisitos_= correlativasBiologia2,creditos=50, anio=2, metodoDeOrdenamiento = porOrdenDeLlegada)
+    const quimica = new Materia(creditos=50, anio=1,_requisitos_=nada, metodoDeOrdenamiento = porOrdenDeLlegada)
+    const anatomiaGral = new Materia(creditos=50, anio=1, _requisitos_=nada, metodoDeOrdenamiento = porOrdenDeLlegada)
+    const medicina = new Carrera(materias= #{biologia1, biologia2, quimica, anatomiaGral})
+
+     // Materias de Derecho y Carrera
+    const latin = new Materia(creditos=50, anio=1, _requisitos_=nada, metodoDeOrdenamiento = porOrdenDeLlegada)
+    const dRomano = new Materia(creditos=50, anio=2, _requisitos_=nada, metodoDeOrdenamiento = porOrdenDeLlegada)
+    const historiaDArgentino = new Materia(creditos=50, anio=2, _requisitos_=nada, metodoDeOrdenamiento = porOrdenDeLlegada)
+    const dPenal1 = new Materia(creditos=50, anio=1, _requisitos_=nada, metodoDeOrdenamiento = porOrdenDeLlegada)
+    const dPenal2 = new Materia(_requisitos_= nada ,creditos=50, anio=2, metodoDeOrdenamiento = porOrdenDeLlegada)
+    const derecho = new Carrera(materias = #{latin, dRomano, historiaDArgentino, dPenal1, dPenal2})
+    const anio1Derecho = new Anio(requisitos = derecho.materiasDe_Anio(1))
+    
+    // Estudiantes
+    const roque = new Estudiante(carreras= #{programacion, medicina})
+    const luisa = new Estudiante(carreras= #{programacion})
+    const romina = new Estudiante(carreras= #{programacion})
+    const alicia = new Estudiante(carreras= #{programacion})
+    const ana = new Estudiante(carreras= #{programacion})
+
+    method initialize(){
+        dPenal2._requisitos_(anio1Derecho)
+        roque.aprobarMateria(new Aprobado(materia=matematica1, nota=7))
+        roque.aprobarMateria(new Aprobado(materia=objetos1, nota=8))
+        luisa.aprobarMateria(new Aprobado(materia=matematica1, nota=7))
+        luisa.aprobarMateria(new Aprobado(materia=objetos1,  nota=8))
+        luisa.aprobarMateria(new Aprobado(materia=elementosProgramacion, nota=9))
+        romina.aprobarMateria(new Aprobado(materia=matematica1, nota=7))
+        romina.aprobarMateria(new Aprobado(materia=objetos1, nota=8))
+        romina.aprobarMateria(new Aprobado(materia=elementosProgramacion, nota=9))
+        alicia.aprobarMateria(new Aprobado(materia=matematica1, nota=9))
+        alicia.aprobarMateria(new Aprobado(materia=objetos1,nota=9))
+        alicia.aprobarMateria(new Aprobado(materia=elementosProgramacion, nota=9))
+        ana.aprobarMateria( new Aprobado(materia=elementosProgramacion, nota=7))
+        roque.aprobarMateria(new Aprobado(materia=elementosProgramacion, nota=9))
+        roque.aprobarMateria(new Aprobado(materia=BBDD, nota=9))
+        roque.aprobarMateria(new Aprobado(materia=quimica, nota=9))
+        roque.aprobarMateria(new Aprobado(materia=biologia1, nota=9))
+    }
+
+    test "Roque puede inscribirse en objetos2 pero no en objetos3 ni en objetos1"{
+        assert.doesNotThrowException({roque.inscribirA_(objetos2)})
+        assert.throwsException({roque.inscribirA_(objetos1)})
+        assert.throwsException({roque.inscribirA_(objetos3)})
+    }
+
+    test "Roque puede inscribirse en elementosProgramacion, objetos2 y concurrente"{
+        assert.doesNotThrowException({roque.inscribirA_(objetos2)})
+        assert.doesNotThrowException({roque.inscribirA_(concurrente)})
+        assert.doesNotThrowException({roque.inscribirA_(biologia2)})
+    }    
+
+    test "Se inscriben luisa, romina, alicia y roque a objetos2"{
+        luisa.inscribirA_(objetos2)
+        romina.inscribirA_(objetos2)
+        alicia.inscribirA_(objetos2)
+        roque.inscribirA_(objetos2)
+        assert.equals(3, objetos2.estudiantesInscriptos().size())
+        assert.equals(1, objetos2.estudiantesEnListaDeEsperaDe().size())
+        assert.equals(roque, objetos2.metodoDeOrdenamiento().primeroDeLaLista(objetos2.estudiantesEnListaDeEsperaDe()))
+    }
+
+    test "Se inscriben luisa, romina, alicia y roque a objetos2, romina se da de baja"{
+        luisa.inscribirA_(objetos2)
+        romina.inscribirA_(objetos2)
+        alicia.inscribirA_(objetos2)
+        roque.inscribirA_(objetos2)
+        romina.bajaDeInscripcionDe(objetos2)
+        assert.equals(3, objetos2.estudiantesInscriptos().size())
+        assert.equals(0, objetos2.estudiantesEnListaDeEsperaDe().size())
+    }
+
+
+    // Tests agregados para Requisitos y las funciones que necesita
+    test "Roque tiene 6 materias aprobadas, 4 son de Proramacion y 2 de Medicina"{
+        assert.equals(6, roque.cantidadDeAprobadas())
+        assert.equals(4, roque.materiasAprobadasDe_(programacion).size())
+        assert.equals(2, roque.materiasAprobadasDe_(medicina).size())
+    }
+
+    test "Roque no puede anotarse con 200 creditos a tFinal pero si con 250"{
+        assert.throwsException({roque.inscribirA_(tFinal)})
+
+        // Se hace aprobar una 5ta materia para llegar a 250 creditos.
+        const aprobado17 = new Aprobado(materia=concurrente,nota=9)
+        roque.aprobarMateria(aprobado17)
+        assert.doesNotThrowException({roque.inscribirA_(tFinal)})
+    }
+
+    test "Requisito para anios de carpincho para anotarse a dPenal2"{
+        // Nota dPenal2 tiene como requisito anio1 que representa todas las materias
+        // de primer año de derecho (latin y dPenal1)
+        
+        // Sin materias aprobadas lanza error al intentar anotarse.
+        const carpincho = new Estudiante(carreras= #{derecho})        
+        assert.throwsException({carpincho.inscribirA_(dPenal2)})
+
+        // Con solo 1 materia de 1ro aprobada lanza error al intentar anotarse.
+        const aprobado18 = new Aprobado(materia=latin, nota=7)
+        carpincho.aprobarMateria(aprobado18)
+        assert.throwsException({carpincho.inscribirA_(dPenal2)})
+
+        // Con todas las materias de 1ro aprobadas NO LANZA ERROR.
+        const aprobado19 = new Aprobado(materia=dPenal1, nota=8)
+        carpincho.aprobarMateria(aprobado19)
+        assert.doesNotThrowException({carpincho.inscribirA_(dPenal2)})
+    }
+
+    test "objetos2 tiene ordenDeLlegada y cupo 3, se anotan roque, luisa, romina, alicia, ana. Roque se baja"{
+        // Para que ana pueda anotarse a objetos2
+        const aprobado20 = new Aprobado(materia=objetos1, nota=9)
+        const aprobado21 = new Aprobado(materia=matematica1, nota=7)
+        ana.aprobarMateria(aprobado20)
+        ana.aprobarMateria(aprobado21)
+
+        roque.inscribirA_(objetos2)
+        luisa.inscribirA_(objetos2)
+        romina.inscribirA_(objetos2)
+        alicia.inscribirA_(objetos2)
+        ana.inscribirA_(objetos2)
+
+        assert.equals(3, objetos2.estudiantesInscriptos().size())
+        assert.equals(2, objetos2.estudiantesEnListaDeEsperaDe().size())
+        assert.equals(alicia, objetos2.metodoDeOrdenamiento().primeroDeLaLista(objetos2.estudiantesEnListaDeEsperaDe()))
+
+        objetos2.bajarInscripcionDe(roque)
+        assert.equals(3, objetos2.estudiantesInscriptos().size())
+        assert.equals(1, objetos2.estudiantesEnListaDeEsperaDe().size())
+        assert.equals(ana, objetos2.metodoDeOrdenamiento().primeroDeLaLista(objetos2.estudiantesEnListaDeEsperaDe()))
+
+    }
+        test "objetos2 tiene elitista y cupo 3, se anotan roque, luisa, romina, alicia, ana. Roque se baja"{
+            // NOTA IMPORTANTE: el promedio de alicia es 9 y el de ana es 7.
+
+        // Para que ana pueda anotarse a objetos2
+        const aprobado20 = new Aprobado(materia=objetos1, nota=7)
+        const aprobado21 = new Aprobado(materia=matematica1, nota=7)
+        ana.aprobarMateria(aprobado20)
+        ana.aprobarMateria(aprobado21)
+
+        objetos2.metodoDeOrdenamiento(elitista)
+        roque.inscribirA_(objetos2)
+        luisa.inscribirA_(objetos2)
+        romina.inscribirA_(objetos2)
+        alicia.inscribirA_(objetos2)
+        ana.inscribirA_(objetos2)
+
+        assert.equals(3, objetos2.estudiantesInscriptos().size())  // 3 anotados
+        assert.equals(2, objetos2.estudiantesEnListaDeEsperaDe().size()) // 2 en lista de espera
+        assert.equals(alicia, objetos2.metodoDeOrdenamiento().primeroDeLaLista(objetos2.estudiantesEnListaDeEsperaDe()))    // alicia es la primera
+
+        objetos2.bajarInscripcionDe(roque)     // se baja roque
+
+        assert.equals(3, objetos2.estudiantesInscriptos().size())  // 3 anotados
+        assert.equals(1, objetos2.estudiantesEnListaDeEsperaDe().size()) // 1 en lista de espera
+        assert.equals(ana, objetos2.metodoDeOrdenamiento().primeroDeLaLista(objetos2.estudiantesEnListaDeEsperaDe()))    // queda ana
+
+    }
+
+    test "objetos2 tiene PorAvance y cupo 3, se anotan luisa, romina, alicia, ana, roque. Luisa se baja"{
+            // NOTA IMPORTANTE: roque tiene 4 materias aprobadas contra 3 materias aprobadas de ana.
+
+        // Para que ana pueda anotarse a objetos2
+        const aprobado20 = new Aprobado(materia=objetos1, nota=7)
+        const aprobado21 = new Aprobado(materia=matematica1, nota=7)
+        ana.aprobarMateria(aprobado20)
+        ana.aprobarMateria(aprobado21)
+
+        objetos2.metodoDeOrdenamiento(porAvance)
+        luisa.inscribirA_(objetos2)
+        romina.inscribirA_(objetos2)
+        alicia.inscribirA_(objetos2)
+        ana.inscribirA_(objetos2)
+        roque.inscribirA_(objetos2)
+        
+        assert.equals(3, objetos2.estudiantesInscriptos().size())  // 3 anotados
+        assert.equals(2, objetos2.estudiantesEnListaDeEsperaDe().size()) // 2 en lista de espera
+        assert.equals(roque,objetos2.metodoDeOrdenamiento().primeroDeLaLista(objetos2.estudiantesEnListaDeEsperaDe()))    // roque es el primero
+
+        objetos2.bajarInscripcionDe(luisa)     // se baja luisa
+
+        assert.equals(3, objetos2.estudiantesInscriptos().size())  // 3 anotados
+        assert.equals(1, objetos2.estudiantesEnListaDeEsperaDe().size()) // 1 en lista de espera
+        assert.equals(ana,objetos2.metodoDeOrdenamiento().primeroDeLaLista(objetos2.estudiantesEnListaDeEsperaDe()))    // queda ana
+
+    }
+
+}
